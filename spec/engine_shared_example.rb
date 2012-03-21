@@ -111,5 +111,24 @@ shared_examples_for "an engine" do |engine|
         MultiJson.decode(example, :symbolize_keys => true).should == expected
       end
     end
+
+    it 'strips //comments' do
+      [
+        [
+          %Q[{\n  "abc":"def"// the abc\n}],
+          { 'abc' => 'def' }
+        ],
+        [
+          %Q{[\n  "foo", // foo\n  "bar" //bar\n]},
+          [ 'foo', 'bar' ]
+        ],
+        [
+          %Q[// a comment\n{"not a comment": "//not a comment"}],
+          { 'not a comment' => '//not a comment' }
+        ]
+      ].each do |example, expected|
+        MultiJson.decode(example).should == expected
+      end
+    end
   end
 end
